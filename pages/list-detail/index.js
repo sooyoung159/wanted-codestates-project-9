@@ -1,19 +1,19 @@
 import styled from "styled-components";
-import Layout from "../components/layout/Layout";
-import View from "../components/layout/View";
-import Grid from "../components/view/Grid";
+import Layout from "../../components/layout/Layout";
+import View from "../../components/layout/View";
+import List from "../../components/view/List";
 
-const Home = () => {
+const ListDetailPage = () => {
   return (
     <Wrapper>
       <Layout />
       <View />
-      <Grid />
+      <List />
     </Wrapper>
   );
 };
 
-export default Home;
+export default ListDetailPage;
 
 const Wrapper = styled.div`
   width: 565px;
