@@ -1,52 +1,78 @@
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 
 const List = () => {
-  return (
-    <Wrapper>
-      <NameCard>
-        <div>이름</div>
-        <div>
-          <span>날짜</span>
-          <MoreIcon src="https://i.balaan.io/mobile/img/icon/icon-more.png" />
-        </div>
-      </NameCard>
-      <ImgContainer>이미지</ImgContainer>
-      <DesContainer>
-        <InfoContainer>
-          <div>
-            <MoreIcon src="https://static.balaan.co.kr/mobile/img/icon/like_hand.png" />
-            <span>1</span>
-            <MoreIcon src="https://static.balaan.co.kr/mobile/img/view/share.png?v=2" />
-          </div>
-          <div>
-            <MoreIcon src="https://static.balaan.co.kr/mobile/img/icon/ic-new-heart-normal.png" />
-          </div>
-        </InfoContainer>
-        <StartContainer>
-          <img src="https://i.balaan.io/mobile/img/icons/icon-star-black.png" />
-          <img src="https://i.balaan.io/mobile/img/icons/icon-star-black.png" />
-          <img src="https://i.balaan.io/mobile/img/icons/icon-star-black.png" />
-          <img src="https://i.balaan.io/mobile/img/icons/icon-star-black.png" />
-          <img src="https://i.balaan.io/mobile/img/icons/icon-star-gray.png" />
-        </StartContainer>
-        <div>내용</div>
-      </DesContainer>
-      <ReviewContainer>
-        <div>
-          <div>아이디</div>
-          <div>
-            금주의 베스트 리뷰로 선정되어 상품권 10,000원이 발급 되었습니다!
-          </div>
-        </div>
+  const reviews = useSelector((state) => state.review.reviews);
 
-        <FormContainer>
-          <div>
-            <input type="text" placeholder="댓글 달기" />
-            <button>게시</button>
-          </div>
-        </FormContainer>
-      </ReviewContainer>
-    </Wrapper>
+  const starRating = (rating) => {
+    const star = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < rating) {
+        star.push(
+          <img
+            key={i}
+            src="https://i.balaan.io/mobile/img/icons/icon-star-black.png"
+          />
+        );
+      } else {
+        star.push(
+          <img
+            key={i}
+            src="https://i.balaan.io/mobile/img/icons/icon-star-gray.png"
+          />
+        );
+      }
+    }
+    return star;
+  };
+
+  return (
+    <>
+      {reviews.map((review) => (
+        <Wrapper key={review.id}>
+          <NameCard>
+            <div>{review.userId}</div>
+            <div>
+              <span>{review.date}</span>
+              <MoreIcon src="https://i.balaan.io/mobile/img/icon/icon-more.png" />
+            </div>
+          </NameCard>
+          <ImgContainer>
+            <img src={review.image} />
+          </ImgContainer>
+          <DesContainer>
+            <InfoContainer>
+              <div>
+                <MoreIcon src="https://static.balaan.co.kr/mobile/img/icon/like_hand.png" />
+                <span>1</span>
+                <MoreIcon src="https://static.balaan.co.kr/mobile/img/view/share.png?v=2" />
+              </div>
+              <div>
+                <MoreIcon src="https://static.balaan.co.kr/mobile/img/icon/ic-new-heart-normal.png" />
+              </div>
+            </InfoContainer>
+            <StartContainer>{starRating(review.starRating)}</StartContainer>
+            <div>{review.review}</div>
+          </DesContainer>
+          <ReviewContainer>
+            {review.comment &&
+              review.comment.map((comment) => (
+                <div>
+                  <div>sooyoung</div>
+                  <div>{comment}</div>
+                </div>
+              ))}
+
+            <FormContainer>
+              <div>
+                <input type="text" placeholder="댓글 달기" />
+                <button>게시</button>
+              </div>
+            </FormContainer>
+          </ReviewContainer>
+        </Wrapper>
+      ))}
+    </>
   );
 };
 
@@ -75,10 +101,13 @@ const MoreIcon = styled.img`
 
 const ImgContainer = styled.div`
   /* max-height: 40rem; */
-  height: 10rem;
+  height: 30rem;
   display: flex;
   align-items: center;
   background-color: aliceblue;
+  > img {
+    max-height: 30rem;
+  }
 `;
 
 const InfoContainer = styled.div`

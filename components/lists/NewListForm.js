@@ -1,12 +1,31 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { reviewActions } from "../../store/review-slice";
+import uuid from "react-uuid";
+import { storage } from "../../firebase";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { sendReviewData } from "../../store/review-actions";
+// import "firebase/storage";
+
+let isInitial = true;
 
 const NewListForm = () => {
+  const dispatch = useDispatch();
+  // const storage = firebase.storage();
+  const reviews = useSelector((state) => state.review);
+
+  const userIdInputRef = useRef();
   const reviewInputRef = useRef();
+  const starRatingRef = useRef();
+  const imageInputRef = useRef();
+
   const [levelWord, setLevelWord] = useState();
-  const [uploadImg, setUploadImg] = useState(
+  const [previewImg, setpreviewImg] = useState(
     "https://cdn.pixabay.com/photo/2017/11/10/05/24/add-2935429_960_720.png"
   );
+  const [uploadImg, setUploadImg] = useState();
+  const [imageUrl, setImageUrl] = useState();
   const [starRating, setStartRating] = useState([
     false,
     false,
@@ -15,7 +34,14 @@ const NewListForm = () => {
     false,
   ]);
 
-  // console.log(starRating.filter(Boolean).length);
+  useEffect(() => {
+    if (isInitial) {
+      isInitial = false;
+      return;
+    }
+
+    dispatch(sendReviewData(reviews));
+  }, [reviews, dispatch]);
 
   const ratingHandler = (idx) => {
     const clicked = [...starRating];
@@ -44,45 +70,75 @@ const NewListForm = () => {
     setStartRating(clicked);
   };
 
-  const inputClick = (event) => {
-    fileRef.current.click();
-  };
-
   const inputHandler = (event) => {
     event.preventDefault();
     let reader = new FileReader();
     let file = event.target.files[0];
-
+    setUploadImg(file);
     if (file) {
-      reader.onloadend = () => {
-        setUploadImg(reader.result);
-      };
       reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        setpreviewImg(reader.result);
+      };
     } else {
       return;
     }
   };
 
-  const satisfaction = () => {
-    switch (starRating.filter(Boolean).length) {
-      case 1:
-        setLevelWord("아쉬워요!");
-        break;
-      case 2:
-        setLevelWord("그냥 그래요");
-        break;
-      case 3:
-        setLevelWord("보통이에요!");
-        break;
-      case 4:
-        setLevelWord("좋아요!");
-        break;
-      case 5:
-        setLevelWord("최고예요!");
-        break;
-      default:
-        break;
-    }
+  const getDate = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+    return [year, month, day].join("-");
+  };
+
+  const submitHandler = async (event) => {
+    event.preventDefault();
+
+    await uploadToFirebaseStorage(uploadImg);
+  };
+
+  const uploadToFirebaseStorage = async (file) => {
+    const newName = file.name
+      .replace(/[~`!#$%^&*+=\-[\]\\';,/{}()|\\":<>?]/g, "")
+      .split(" ")
+      .join("");
+
+    const metaData = {
+      contentType: file.type,
+    };
+
+    const storageRef = ref(storage, "Images/" + newName);
+    const UploadTask = uploadBytesResumable(storageRef, file, metaData);
+    await UploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        alert(`error: image upload error ${JSON.stringify(error)}`);
+      },
+      () => {
+        getDownloadURL(UploadTask.snapshot.ref).then((downloadUrl) => {
+          // setImageUrl(downloadUrl);
+          // console.log(`완료 url: ${downloadUrl}`);
+          dispatch(
+            reviewActions.addReview({
+              id: uuid(),
+              date: getDate(new Date()),
+              userId: userIdInputRef.current.value,
+              starRating: starRating.filter(Boolean).length,
+              image: downloadUrl,
+              review: reviewInputRef.current.value,
+            })
+          );
+        });
+      }
+    );
   };
 
   return (
@@ -91,7 +147,7 @@ const NewListForm = () => {
         {/* <Title>리뷰 작성</Title> */}
         <User>
           <label>사용자 ID</label>
-          <input type="text" />
+          <input type="text" ref={userIdInputRef} />
         </User>
         <StarContainer>
           <div>만족도</div>
@@ -118,7 +174,7 @@ const NewListForm = () => {
           <div>사진 추가</div>
           <label htmlFor="imgUpload">
             <Img>
-              <img src={uploadImg} alt="btn" />
+              <img src={previewImg} alt="btn" />
             </Img>
           </label>
           {/* <button onClick={inputClick}>
@@ -127,7 +183,7 @@ const NewListForm = () => {
           <ImageInput
             type="file"
             id="imgUpload"
-            // accept="image/jpg,impge/png,image/jpeg,image/gif"
+            accept="image/*"
             onChange={inputHandler}
           />
         </ImgContainer>
@@ -141,7 +197,9 @@ const NewListForm = () => {
             placeholder="다른 분께 도움이 되는 솔직한 후기를 남겨주세요!"
           ></input>
         </ReviewArea>
-        <SubmitButton>리뷰 남기기</SubmitButton>
+        <SubmitButton type="submit" onClick={submitHandler}>
+          리뷰 남기기
+        </SubmitButton>
       </form>
     </Wrapper>
   );

@@ -1,17 +1,18 @@
+import { useSelector } from "react-redux";
 import styled from "styled-components";
 
 const Grid = () => {
+  const reviews = useSelector((state) => state.review.reviews);
+  console.log(reviews);
   return (
     <Wrapper>
-      <GridItem>1</GridItem>
-      <GridItem>2</GridItem>
-      <GridItem>3</GridItem>
-      <GridItem>1</GridItem>
-      <GridItem>2</GridItem>
-      <GridItem>3</GridItem>
-      <GridItem>1</GridItem>
-      <GridItem>2</GridItem>
-      <GridItem>3</GridItem>
+      {reviews.map((review) => {
+        return (
+          <GridItem key={review.id}>
+            <img src={review.image} />
+          </GridItem>
+        );
+      })}
     </Wrapper>
   );
 };
@@ -22,11 +23,13 @@ const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 200px 200px 200px;
-  width: 100%;
-  height: 100%;
 `;
 
 const GridItem = styled.div`
   background-color: gray;
   margin: 1px;
+  > img {
+    width: 100%;
+    height: 100%;
+  }
 `;

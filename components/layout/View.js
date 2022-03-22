@@ -9,7 +9,7 @@ const View = () => {
   };
 
   const showListView = () => {
-    router.push("/list-detail");
+    router.push("/list");
   };
 
   const showNewList = () => {
