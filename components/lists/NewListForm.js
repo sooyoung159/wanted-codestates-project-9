@@ -6,6 +6,9 @@ import uuid from "react-uuid";
 import { storage } from "../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { sendReviewData } from "../../store/review-actions";
+import Loader from "../ui/Loader";
+import { useRouter } from "next/router";
+import { uiAction } from "../../store/ui-slice";
 // import "firebase/storage";
 
 let isInitial = true;
@@ -14,18 +17,20 @@ const NewListForm = () => {
   const dispatch = useDispatch();
   // const storage = firebase.storage();
   const reviews = useSelector((state) => state.review);
+  const router = useRouter();
 
   const userIdInputRef = useRef();
+  const [userId, setUserId] = useState();
   const reviewInputRef = useRef();
-  const starRatingRef = useRef();
-  const imageInputRef = useRef();
+  const [review, setReview] = useState();
 
   const [levelWord, setLevelWord] = useState();
   const [previewImg, setpreviewImg] = useState(
     "https://cdn.pixabay.com/photo/2017/11/10/05/24/add-2935429_960_720.png"
   );
   const [uploadImg, setUploadImg] = useState();
-  const [imageUrl, setImageUrl] = useState();
+  const loading = useSelector((state) => state.ui.loading);
+  // const [loading, setLoading] = useState(false);
   const [starRating, setStartRating] = useState([
     false,
     false,
@@ -94,10 +99,10 @@ const NewListForm = () => {
     return [year, month, day].join("-");
   };
 
-  const submitHandler = async (event) => {
+  const submitHandler = (event) => {
     event.preventDefault();
-
-    await uploadToFirebaseStorage(uploadImg);
+    console.log(loading);
+    uploadToFirebaseStorage(uploadImg);
   };
 
   const uploadToFirebaseStorage = async (file) => {
@@ -118,96 +123,112 @@ const NewListForm = () => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log(`Upload is ${progress}% done`);
+        dispatch(uiAction.showLoading());
+        console.log(loading);
       },
       (error) => {
-        alert(`error: image upload error ${JSON.stringify(error)}`);
+        console.log(error);
       },
       () => {
         getDownloadURL(UploadTask.snapshot.ref).then((downloadUrl) => {
-          // setImageUrl(downloadUrl);
-          // console.log(`완료 url: ${downloadUrl}`);
           dispatch(
             reviewActions.addReview({
               id: uuid(),
               date: getDate(new Date()),
-              userId: userIdInputRef.current.value,
+              // sortDate: new Date(),
+              userId: userId,
               starRating: starRating.filter(Boolean).length,
               image: downloadUrl,
-              review: reviewInputRef.current.value,
+              review: review,
             })
           );
         });
+        dispatch(uiAction.showLoading());
+        console.log(loading);
+        router.push("/");
       }
     );
+    console.log(loading);
   };
 
+  const saveUserUd = () => {
+    setUserId(userIdInputRef.current.value);
+  };
+
+  const saveReview = () => {
+    setReview(reviewInputRef.current.value);
+  };
+
+  if (loading) <Loader />;
   return (
-    <Wrapper>
-      <form>
-        {/* <Title>리뷰 작성</Title> */}
-        <User>
-          <label>사용자 ID</label>
-          <input type="text" ref={userIdInputRef} />
-        </User>
-        <StarContainer>
-          <div>만족도</div>
-          <StarLevel>
-            <div>
-              {starRating.map((star, idx) => {
-                return (
-                  <img
-                    key={idx}
-                    src={
-                      star
-                        ? "https://i.balaan.io/mobile/img/icons/icon-star-black.png"
-                        : "https://i.balaan.io/mobile/img/icons/icon-star-gray.png"
-                    }
-                    onClick={() => ratingHandler(idx)}
-                  />
-                );
-              })}
-            </div>
-            {levelWord && <LevelTitle>{levelWord}</LevelTitle>}
-          </StarLevel>
-        </StarContainer>
-        <ImgContainer>
-          <div>사진 추가</div>
-          <label htmlFor="imgUpload">
-            <Img>
-              <img src={previewImg} alt="btn" />
-            </Img>
-          </label>
-          {/* <button onClick={inputClick}>
-          여기로 되게 만들어보자{fileRef.current}
-        </button> */}
-          <ImageInput
-            type="file"
-            id="imgUpload"
-            accept="image/*"
-            onChange={inputHandler}
-          />
-        </ImgContainer>
-        <ReviewArea>
-          <label>후기 남기기</label>
-          <input
-            id="description"
-            required
-            rows="5"
-            ref={reviewInputRef}
-            placeholder="다른 분께 도움이 되는 솔직한 후기를 남겨주세요!"
-          ></input>
-        </ReviewArea>
-        <SubmitButton type="submit" onClick={submitHandler}>
-          리뷰 남기기
-        </SubmitButton>
-      </form>
-    </Wrapper>
+    <>
+      {/* {loading && <Loader />} */}
+      <Wrapper>
+        <form>
+          {/* <Title>리뷰 작성</Title> */}
+          <User>
+            <label>사용자 ID</label>
+            <input type="text" ref={userIdInputRef} onChange={saveUserUd} />
+          </User>
+          <StarContainer>
+            <div>만족도</div>
+            <StarLevel>
+              <div>
+                {starRating.map((star, idx) => {
+                  return (
+                    <img
+                      key={idx}
+                      src={
+                        star
+                          ? "https://i.balaan.io/mobile/img/icons/icon-star-black.png"
+                          : "https://i.balaan.io/mobile/img/icons/icon-star-gray.png"
+                      }
+                      onClick={() => ratingHandler(idx)}
+                    />
+                  );
+                })}
+              </div>
+              {levelWord && <LevelTitle>{levelWord}</LevelTitle>}
+            </StarLevel>
+          </StarContainer>
+          <ImgContainer>
+            <div>사진 추가</div>
+            <label htmlFor="imgUpload">
+              <Img>
+                <img src={previewImg} alt="btn" />
+              </Img>
+            </label>
+            <ImageInput
+              type="file"
+              id="imgUpload"
+              accept="image/*"
+              onChange={inputHandler}
+            />
+          </ImgContainer>
+          <ReviewArea>
+            <label>후기 남기기</label>
+            <input
+              id="description"
+              required
+              rows="5"
+              ref={reviewInputRef}
+              onChange={saveReview}
+              placeholder="다른 분께 도움이 되는 솔직한 후기를 남겨주세요!"
+            ></input>
+          </ReviewArea>
+          <SubmitButton type="submit" onClick={submitHandler}>
+            리뷰 남기기
+          </SubmitButton>
+        </form>
+      </Wrapper>
+    </>
   );
 };
 
 export default NewListForm;
 
 const Wrapper = styled.div`
+  display: ${(props) => (props.loading ? "none" : "")};
   height: 100%;
   padding: 1rem;
   margin-bottom: 0px;

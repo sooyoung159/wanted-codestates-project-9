@@ -28,7 +28,13 @@ export const fetchReviewData = () => {
   return async (dispatch) => {
     const fetchData = async () => {
       const response = await fetch(
-        "https://react-http-6a6f2-default-rtdb.firebaseio.com/review.json"
+        "https://react-http-6a6f2-default-rtdb.firebaseio.com/review.json",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
       );
       if (!response.ok) {
         throw new Error("Could not fetch review data");

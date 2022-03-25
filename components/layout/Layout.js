@@ -1,9 +1,16 @@
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import Notification from "../ui/Notification";
 
 const Layout = () => {
+  const notification = useSelector((state) => state.ui.showNotification);
+
   return (
     <Wrapper>
       <Content>
+        {notification && (
+          <Notification status="copy" message="클립보드에 복사되었습니다" />
+        )}
         <IconWrapper>
           <Bugger />
           <Search />

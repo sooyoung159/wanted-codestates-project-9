@@ -1,8 +1,17 @@
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { uiAction } from "../../store/ui-slice";
+import Modal from "../ui/Modal";
 
 const View = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const sort = useSelector((state) => state.review.sort);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectView, setSelectView] = useState(true);
+  const hover = useSelector((state) => state.ui.hover);
 
   const showGridView = () => {
     router.push("/");
@@ -16,25 +25,30 @@ const View = () => {
     router.push("/new-list");
   };
 
+  const modalHandler = () => {
+    setOpenModal(!openModal);
+  };
+
   return (
     <div>
+      {openModal && <Modal modalHandler={modalHandler} />}
       <Sorting>
-        <Button>
+        <Button onClick={modalHandler}>
           정렬
           <Arrow src="https://static.balaan.co.kr/mobile/img/icon/search/icon-arrow-bottom@2x.png" />
         </Button>
       </Sorting>
       <SortContainer>
-        <Sort>정렬 표시</Sort>
+        <Sort>{sort}</Sort>
         <button onClick={showNewList}>새 글</button>
       </SortContainer>
       <ViewContainer>
-        <ImgContainer onClick={showGridView}>
+        <GridImgContainer onClick={showGridView}>
           <Img src="https://static.balaan.co.kr/mobile/img/icon/contents/tab-icon-01@2x.png" />
-        </ImgContainer>
-        <ImgContainer onClick={showListView}>
+        </GridImgContainer>
+        <ListImgContainer onClick={showListView}>
           <Img src="https://static.balaan.co.kr/mobile/img/icon/contents/tab-icon-02@2x.png" />
-        </ImgContainer>
+        </ListImgContainer>
       </ViewContainer>
     </div>
   );
@@ -48,11 +62,18 @@ const ViewContainer = styled.div`
   justify-content: space-around;
 `;
 
-const ImgContainer = styled.div`
+const GridImgContainer = styled.div`
   text-align: center;
   padding: 1rem;
   width: 100%;
-  border-bottom: 1px solid gray;
+  border-bottom: 2px solid lightgray;
+`;
+
+const ListImgContainer = styled.div`
+  text-align: center;
+  padding: 1rem;
+  width: 100%;
+  border-bottom: 2px solid lightgray;
 `;
 
 const Img = styled.img`
@@ -70,8 +91,9 @@ const Arrow = styled.img`
 
 const Button = styled.button`
   font-size: 1rem;
+  color: #4348a2;
   padding: 0.3rem;
-  border: 1px blue solid;
+  border: 1px #4348a2 solid;
   margin: 0.5rem;
   border-radius: 20px;
 `;
@@ -79,9 +101,16 @@ const Button = styled.button`
 const SortContainer = styled.div`
   ${({ theme }) => theme.common.flexCenter}
   justify-content: space-between;
-  background-color: lightgray;
+  background-color: #f9f9f9;
   padding: 0.5rem;
   padding-right: 3rem;
+  > button {
+    font-size: 0.5rem;
+    color: #4348a2;
+    background-color: #e7e8f9;
+    padding: 0.5rem;
+    border-radius: 20px;
+  }
 `;
 
 const Sorting = styled.div`
@@ -91,9 +120,10 @@ const Sorting = styled.div`
 
 const Sort = styled.div`
   width: 70px;
-  font-size: 1rem;
+  font-size: 0.5rem;
+  color: #4348a2;
   padding: 0.5rem;
-  border: 1px blue solid;
+  background-color: #e7e8f9;
   margin: 0.5rem;
   border-radius: 20px;
   text-align: center;
