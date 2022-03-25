@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { reviewActions } from "../../store/review-slice";
 import { uiAction } from "../../store/ui-slice";
-import Comment from "../comment/Comment";
+import CommentForm from "../comment/CommentForm";
 
 const List = (props) => {
   const reviews = useSelector((state) => state.review.reviews);
@@ -145,7 +145,7 @@ const List = (props) => {
                     <div>{comment}</div>
                   </Comments>
                 ))}
-              <Comment id={review.id} />
+              <CommentForm id={review.id} />
             </CommentContainer>
           </Wrapper>
         ))}

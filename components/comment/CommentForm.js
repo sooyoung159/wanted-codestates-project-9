@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { reviewActions } from "../../store/review-slice";
 
-const Comment = (props) => {
+const CommentForm = (props) => {
   const dispatch = useDispatch();
   const commentRef = useRef();
 
@@ -44,7 +44,7 @@ const Comment = (props) => {
   );
 };
 
-export default Comment;
+export default CommentForm;
 
 const FormContainer = styled.div`
   margin: 1.2rem 1rem;
