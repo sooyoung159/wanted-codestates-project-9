@@ -13,13 +13,13 @@ const reviewSlice = createSlice({
       state.reviews.unshift({
         id: newReview.id,
         date: newReview.date,
-        // sortDate: newReview.sortDate,
         userId: newReview.userId,
         starRating: newReview.starRating,
         image: newReview.image,
         review: newReview.review,
         comments: ["예뻐요"],
         like: 0,
+        wish: false,
       });
       state.addReview = true;
     },
@@ -43,6 +43,12 @@ const reviewSlice = createSlice({
       newArr[findIndex].like += 1;
       state.addReview = true;
     },
+    // addWish(state, action) {
+    //   const id = action.payload;
+    //   const findIndex = state.reviews.findIndex((item) => item.id === id);
+    //   const newArr = [...state.reviews];
+    //   newArr[findIndex].wish = !newArr[findIndex].wish;
+    // },
     sortReview(state, action) {
       const type = action.payload;
       const newArr = [...state.reviews];

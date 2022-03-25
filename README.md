@@ -1,34 +1,137 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Description
 
-## Getting Started
+---
 
-First, run the development server:
+고객이 리뷰를 등록 하고 리뷰를 확인할 수 있는 기능을 구현합니다.
 
-```bash
-npm run dev
-# or
-yarn dev
+- **상품 리뷰 리스트 페이지** : 고객이 구매한 상품에 대한 전체 리뷰를 확인 할 수 있는 페이지
+- **상품 리뷰 상세 페이지** : 특정 리뷰를 클릭하면 보이는 리뷰 상세 페이지
+- 리뷰 등록 페이지 : 리뷰를 등록하는 페이지
+
+# 배포 링크
+
+---
+
+https://wanted-codestates-project-9-one.vercel.app/
+
+# Usage(자세한 실행 방법)
+
+---
+
+1. git clone
+
+```
+git clone https://github.com/sooyoung159/wanted-codestates-project-9.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. wanted_pre_onboarding 폴더를 인터프린터나 컴파일러로 열기
+3. 필요한 라이브러리 설치
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```
+npm install
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+4. 실행
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```
+npm run dev
+```
 
-## Learn More
+# 기술스택
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js
+- Firebase
+- Redux-toolkit
+- styled-components
+- uuid
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 구현방법
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- 기본적으로 `Firebase` 서버를 사용하여 데이터를 저장하고 페이지가 실행되면 `Redux` 저장해서 데이터를 사용
+- 이미지, 아이콘등은 모두 발란페이지에 있는 이미지 스프라이트를 사용
 
-## Deploy on Vercel
+## 상품 리뷰 리스트 페이지
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- 무한스크롤
+  <br/>
+  ![무한스크롤](https://user-images.githubusercontent.com/68948735/160121147-e0d76388-3b7c-4f8d-a1c6-be993a74f745.gif)
+  <br/>
+
+  - `IntersectionObserver api` 사용
+  - 9장의 카드만 보여주고 마지막 카드를 만나면 9장씩 더 보여주는 것으로 구현
+  - 그리드 뷰, 리스트뷰 동일
+
+- 정렬
+  <br/>
+  ![정렬변경](https://user-images.githubusercontent.com/68948735/160121236-bdf824e3-a4de-452b-90dc-b33bb0975746.gif)
+  <br/>
+  - 정렬버튼 선택에 따라 최신순, 랜덤순, 리뷰많은순, 좋아요 많은 순으로 정렬한다.
+
+### 그리드 페이지
+
+---
+
+- 상세페이지로 이동
+  <br/>
+  ![상세페이지 이동](https://user-images.githubusercontent.com/68948735/160121365-c220ded0-b0fb-4160-ac7c-4bc4827bbed2.gif)
+  <br/>
+  - 사진만 나열되는 그리드 뷰에서 사진을 선택하면 사진에 맞는 상세 리뷰를 확인할 수 있다.
+
+### 리스트 페이지
+
+---
+
+- 좋아요, 댓글, 공유하기
+  <br/>
+  ![좋아요](https://user-images.githubusercontent.com/68948735/160121438-0352e569-2edf-4574-84f4-52ad0a46a4fa.gif)
+  <br/>
+  - 공유하기를 누르면 리뷰의 상세페이지가 복사된다. 클립보드가 복사되었다는 문구가 보이며 공유 가능하다.
+  - 댓글 입력하면 추가되고, 좋아요 클릭시 좋아요 수가 올라간다.
+  - 댓글, 좋아요 또한 firebase에 저장되므로 새로고침등을 하더라도 입력한 데이터를 그대로 받을 수 있다.
+
+## 상품 리뷰 상세 페이지
+
+---
+
+- 제품의 상세 페이지를 보여준다.
+- 리스트페이지와 동일하다.
+
+## 리뷰 등록 페이지
+
+---
+
+- 아이디, 별점, 사진, 리뷰 등록
+  <br/>
+  ![리뷰등록](https://user-images.githubusercontent.com/68948735/160121495-3f6a13ed-688e-4855-9b85-ecb59a90ae52.gif)
+  <br/>
+
+- 아이디, 별점, 사진, 리뷰 모두를 입력해야 리뷰남기기 버튼이 활성화 된다.
+- 별 클릭시 별의 갯수를 확인 할 수 있으며 그에 따라 간단한 평이 나타난다.
+- 사진 추가 버튼을 누르면 사진을 선택할 수 있으며 선택한 사진이 보여진다.
+- 모두 입력 후 리뷰남기기 버튼을 클릭하면 firebase 서버로 전송된다. 이 때 업로드 시간 동안 로딩 화면 보여지며 완료 후 첫 페이지로 돌아가고 방금 등록한 리뷰도 바로 확인할 수 있다.
+
+# 개발 중 어려웠던 점 && 해결
+
+---
+
+## 어려웠던점
+
+- 데이터 저장과 사용이 있어서 서버와 `ssr`이 가장 먼저 떠올랐다. 그래서 선택한 것이 `Firebase`와 `Next.js` 였다. 하지만 제대로 구현 해본적이 없어서 처음 시작 세팅부터 쉽지 않았다.
+- `styled-components`가 렌더링 될때마다 적용되지 않았다.
+- 사진을 다른정보와 같이 `Firebase`의 database에 저장하니 사진 정보를 받을 수가 없었다.
+- `Firebase` 업로드시 로딩화면 표현이 잘되지 않았다.
+
+## 해결
+
+- 공식문서와 다른 사람들의 블로그를 찾아가며 막히는 거 하나하나 고쳐나갔다. 공식문서가 가장 많은 도움이 되었다.
+- `babel` 플러그인에 `styled-components`를 추가해주었다.
+- `Firebase`의 storage에 사진을 업로드 하고 그 사진의 url을 database에 저장해서 사진 정보를 받았다.
+- 업로드시 비동기로 이루어지기 때문에 `useState`를 이용한 loading표시가 쉽지 않았다. 공식문서를 보니 업로드시 업로드 동안의 state가 있어 거기서 loading이 표시되게 구현하였다.
+
+# 후기
+
+---
+
+- `Next.js`를 사용했지만 마음이 급급해 핵심 기능을 거의 사용하지 못하고 `React` 이용하여 구현하였다. 새롭게 도전해 본 것은 좋았지만 이부분이 아쉬웠다. 이번 과제가 잘 마무리 되면 `non-sql`을 이용한 간단한 서버구축과 `Next.js`와 `typeScript`를 이용해 나만의 blog를 만들어 봐야겠다. 그

@@ -28,29 +28,31 @@ const Grid = () => {
     };
     const observer = new IntersectionObserver(scrollObserver, option);
     if (infinityRef.current) observer.observe(infinityRef.current);
-  }, []);
+  }, [size]);
 
   const showListDetail = (id) => {
     router.push("/" + id);
   };
 
   return (
-    <Wrapper>
-      {reviews
-        .filter((review, idx) => idx < size)
-        .map((review) => {
-          return (
-            <GridItem
-              key={review.id}
-              onClick={() => showListDetail(review.id)}
-              id={review.id}
-            >
-              <img src={review.image} />
-            </GridItem>
-          );
-        })}
+    <>
+      <Wrapper>
+        {reviews
+          .filter((review, idx) => idx < size)
+          .map((review) => {
+            return (
+              <GridItem
+                key={review.id}
+                onClick={() => showListDetail(review.id)}
+                id={review.id}
+              >
+                <img src={review.image} />
+              </GridItem>
+            );
+          })}
+      </Wrapper>
       <div ref={infinityRef}></div>
-    </Wrapper>
+    </>
   );
 };
 
@@ -58,7 +60,6 @@ export default Grid;
 
 const Wrapper = styled.div`
   display: grid;
-  /* height: 100%; */
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 200px 200px 200px;
 `;

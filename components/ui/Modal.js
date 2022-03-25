@@ -29,6 +29,7 @@ const Modal = (props) => {
             <RadioButton>
               <label htmlFor="latest">최신순</label>
               <input
+                name="sort"
                 type="radio"
                 id="latest"
                 defaultChecked={status === "latest"}
@@ -38,6 +39,7 @@ const Modal = (props) => {
             <RadioButton>
               <label htmlFor="like">좋아요 많은 순</label>
               <input
+                name="sort"
                 type="radio"
                 id="like"
                 defaultChecked={status === "like"}
@@ -47,6 +49,7 @@ const Modal = (props) => {
             <RadioButton>
               <label htmlFor="comment">리뷰 많은순</label>
               <input
+                name="sort"
                 type="radio"
                 id="comment"
                 defaultChecked={status === "comment"}
@@ -56,8 +59,8 @@ const Modal = (props) => {
             <RadioButton>
               <label htmlFor="random">랜덤 정렬</label>
               <input
+                name="sort"
                 type="radio"
-                id="random"
                 defaultChecked={status === "random"}
                 onClick={() => radioHandler("random")}
               />

@@ -12,25 +12,24 @@ import { uiAction } from "../../store/ui-slice";
 // import "firebase/storage";
 
 let isInitial = true;
+let preImg =
+  "https://cdn.pixabay.com/photo/2017/11/10/05/24/add-2935429_960_720.png";
 
 const NewListForm = () => {
   const dispatch = useDispatch();
-  // const storage = firebase.storage();
   const reviews = useSelector((state) => state.review);
   const router = useRouter();
 
   const userIdInputRef = useRef();
   const [userId, setUserId] = useState();
+  const [idCheck, setIdCheck] = useState(false);
   const reviewInputRef = useRef();
   const [review, setReview] = useState();
-
+  const [reveiwCheck, setReveiwCheck] = useState(false);
   const [levelWord, setLevelWord] = useState();
-  const [previewImg, setpreviewImg] = useState(
-    "https://cdn.pixabay.com/photo/2017/11/10/05/24/add-2935429_960_720.png"
-  );
+  const [previewImg, setpreviewImg] = useState(preImg);
   const [uploadImg, setUploadImg] = useState();
   const loading = useSelector((state) => state.ui.loading);
-  // const [loading, setLoading] = useState(false);
   const [starRating, setStartRating] = useState([
     false,
     false,
@@ -38,6 +37,8 @@ const NewListForm = () => {
     false,
     false,
   ]);
+  const [formCheck, setFormCheck] = useState(true);
+  const [loadingTest, setLoadingTest] = useState(false);
 
   useEffect(() => {
     if (isInitial) {
@@ -47,6 +48,17 @@ const NewListForm = () => {
 
     dispatch(sendReviewData(reviews));
   }, [reviews, dispatch]);
+
+  const checkForm = () => {
+    if (
+      idCheck &&
+      reveiwCheck &&
+      previewImg !== preImg &&
+      starRating.filter(Boolean).length > 0
+    ) {
+      setFormCheck(false);
+    }
+  };
 
   const ratingHandler = (idx) => {
     const clicked = [...starRating];
@@ -72,7 +84,9 @@ const NewListForm = () => {
           break;
       }
     }
+
     setStartRating(clicked);
+    checkForm();
   };
 
   const inputHandler = (event) => {
@@ -85,6 +99,7 @@ const NewListForm = () => {
       reader.onloadend = () => {
         setpreviewImg(reader.result);
       };
+      checkForm();
     } else {
       return;
     }
@@ -101,7 +116,6 @@ const NewListForm = () => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    console.log(loading);
     uploadToFirebaseStorage(uploadImg);
   };
 
@@ -122,9 +136,13 @@ const NewListForm = () => {
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`Upload is ${progress}% done`);
-        dispatch(uiAction.showLoading());
-        console.log(loading);
+        if (progress === 100) {
+          setLoadingTest(false);
+        } else {
+          setLoadingTest(true);
+        }
+        // console.log(`Upload is ${progress}% done`);
+        // dispatch(uiAction.showLoading());
       },
       (error) => {
         console.log(error);
@@ -134,8 +152,6 @@ const NewListForm = () => {
           dispatch(
             reviewActions.addReview({
               id: uuid(),
-              date: getDate(new Date()),
-              // sortDate: new Date(),
               userId: userId,
               starRating: starRating.filter(Boolean).length,
               image: downloadUrl,
@@ -144,22 +160,30 @@ const NewListForm = () => {
           );
         });
         dispatch(uiAction.showLoading());
-        console.log(loading);
         router.push("/");
       }
     );
-    console.log(loading);
   };
 
-  const saveUserUd = () => {
+  const saveUserId = () => {
     setUserId(userIdInputRef.current.value);
+    if (userIdInputRef.current.value.length > 3) {
+      setIdCheck(true);
+      checkForm();
+    }
   };
 
   const saveReview = () => {
     setReview(reviewInputRef.current.value);
+    if (reviewInputRef.current.value.length > 3) {
+      setReveiwCheck(true);
+      checkForm();
+    }
   };
 
-  if (loading) <Loader />;
+  if (loadingTest) {
+    return <Loader />;
+  }
   return (
     <>
       {/* {loading && <Loader />} */}
@@ -168,7 +192,7 @@ const NewListForm = () => {
           {/* <Title>리뷰 작성</Title> */}
           <User>
             <label>사용자 ID</label>
-            <input type="text" ref={userIdInputRef} onChange={saveUserUd} />
+            <input type="text" ref={userIdInputRef} onChange={saveUserId} />
           </User>
           <StarContainer>
             <div>만족도</div>
@@ -216,7 +240,12 @@ const NewListForm = () => {
               placeholder="다른 분께 도움이 되는 솔직한 후기를 남겨주세요!"
             ></input>
           </ReviewArea>
-          <SubmitButton type="submit" onClick={submitHandler}>
+          <SubmitButton
+            type="submit"
+            onClick={submitHandler}
+            disabled={formCheck}
+            formCheck={formCheck}
+          >
             리뷰 남기기
           </SubmitButton>
         </form>
@@ -229,21 +258,24 @@ export default NewListForm;
 
 const Wrapper = styled.div`
   display: ${(props) => (props.loading ? "none" : "")};
-  height: 100%;
+  height: 100vh;
   padding: 1rem;
   margin-bottom: 0px;
   padding-bottom: 0;
+  > form {
+    height: 100vh;
+  }
 `;
 
 const User = styled.div`
   > label {
     display: block;
     padding-top: 1rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 2vh;
   }
   > input {
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 2vh;
   }
 `;
 
@@ -259,20 +291,18 @@ const StarContainer = styled.div`
 
 const StarLevel = styled.div`
   display: flex;
-  /* justify-content: space-between; */
   > div {
     padding-bottom: 0.5rem;
 
     > img {
       width: 1.2rem;
       padding-bottom: 1rem;
-      /* padding-left: 5rem; */
     }
   }
 `;
 
 const LevelTitle = styled.div`
-  padding-top: 0.1rem;
+  padding-top: 1vh;
   padding-left: 5rem;
 `;
 
@@ -280,15 +310,18 @@ const ImgContainer = styled.div`
   > div {
     padding-bottom: 0.5rem;
   }
+  > div {
+    margin-bottom: 2vh;
+  }
 `;
 
 const Img = styled.div`
   text-align: center;
   > img {
     width: 20rem;
-    height: 15rem;
+    height: 10rem;
   }
-  padding-bottom: 1rem;
+  padding-bottom: 8vh;
 `;
 
 const ImageInput = styled.input`
@@ -307,7 +340,7 @@ const ReviewArea = styled.div`
   > input {
     display: block;
     width: 99%;
-    height: 5rem;
+    height: 15vh;
     resize: none;
     border: 1px solid black;
     margin-bottom: 1rem;
@@ -319,15 +352,6 @@ const SubmitButton = styled.button`
   color: white;
   width: 100%;
   height: 2rem;
-  background-color: black;
+  background-color: ${(props) => (props.formCheck ? "lightgray" : "black")};
   margin-bottom: 1rem;
-`;
-
-const Review = styled.textarea`
-  width: 100%;
-  /* height: 300px; */
-  border: 1px solid black;
-  resize: none;
-  padding: 0.5rem;
-  /* margin-right: 1rem; */
 `;

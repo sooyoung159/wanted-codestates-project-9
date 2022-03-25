@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Modal from "../ui/Modal";
@@ -11,6 +11,15 @@ const View = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectView, setSelectView] = useState(true);
   const hover = useSelector((state) => state.ui.hover);
+
+  useEffect(() => {
+    let currentUrl = window.location.href;
+    if (currentUrl.includes("list")) {
+      setSelectView(false);
+    } else {
+      setSelectView(true);
+    }
+  }, []);
 
   const showGridView = () => {
     router.push("/");
@@ -42,10 +51,10 @@ const View = () => {
         <button onClick={showNewList}>새 글</button>
       </SortContainer>
       <ViewContainer>
-        <GridImgContainer onClick={showGridView}>
+        <GridImgContainer onClick={showGridView} selected={selectView}>
           <Img src="https://static.balaan.co.kr/mobile/img/icon/contents/tab-icon-01@2x.png" />
         </GridImgContainer>
-        <ListImgContainer onClick={showListView}>
+        <ListImgContainer onClick={showListView} selected={selectView}>
           <Img src="https://static.balaan.co.kr/mobile/img/icon/contents/tab-icon-02@2x.png" />
         </ListImgContainer>
       </ViewContainer>
@@ -65,14 +74,16 @@ const GridImgContainer = styled.div`
   text-align: center;
   padding: 1rem;
   width: 100%;
-  border-bottom: 2px solid lightgray;
+  border-bottom: ${(props) =>
+    props.selected ? "2px solid black" : "2px solid lightgray"};
 `;
 
 const ListImgContainer = styled.div`
   text-align: center;
   padding: 1rem;
   width: 100%;
-  border-bottom: 2px solid lightgray;
+  border-bottom: ${(props) =>
+    props.selected ? "2px solid lightgray" : "2px solid black"};
 `;
 
 const Img = styled.img`

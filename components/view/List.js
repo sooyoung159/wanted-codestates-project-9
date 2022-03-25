@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { fetchReviewData } from "../../store/review-actions";
 import { reviewActions } from "../../store/review-slice";
 import { uiAction } from "../../store/ui-slice";
 import CommentForm from "../comment/CommentForm";
@@ -12,9 +13,10 @@ const List = (props) => {
   const idIndex = props.index ? props.index : 0;
   const infinityRef = useRef();
   const notification = useSelector((state) => state.ui.toggle);
+  const [wish, setWish] = useState(false);
 
   useEffect(() => {
-    if (!reviews) {
+    if (reviews.length === 0) {
       dispatch(fetchReviewData());
       return;
     }
@@ -38,9 +40,8 @@ const List = (props) => {
       threshold: 0,
     };
     const observer = new IntersectionObserver(scrollObserver, option);
-    console.log(infinityRef.current);
     if (infinityRef.current) observer.observe(infinityRef.current);
-  }, []);
+  }, [size]);
 
   const starRating = (rating) => {
     const star = [];
@@ -67,6 +68,10 @@ const List = (props) => {
   const likeHanler = (id) => {
     dispatch(reviewActions.addLike(id));
   };
+
+  // const wishHandler = (id) => {
+  //   dispatch(reviewActions.addWish(id));
+  // };
 
   const copyToClipboard = (text) => {
     const tmp = document.createElement("textarea");
@@ -96,8 +101,6 @@ const List = (props) => {
     setTimeout(() => {
       dispatch(uiAction.toggle());
     }, 1000);
-
-    console.log(notification);
   };
 
   return (
@@ -123,6 +126,7 @@ const List = (props) => {
                   <LikeIcon
                     onClick={() => likeHanler(review.id)}
                     src="https://static.balaan.co.kr/mobile/img/icon/like_hand.png"
+                    like={review.like !== 0}
                   />
                   {review.like !== 0 && <Like>{review.like}</Like>}
                   <ShareIcon
@@ -182,6 +186,8 @@ const LikeIcon = styled.img`
   max-width: 2rem;
   max-height: 2rem;
   margin-right: 1rem;
+  color: black;
+  filter: ${(props) => (props.like ? "brightness(0)" : "")};
 `;
 
 const Like = styled.div`
@@ -201,6 +207,7 @@ const HeartIcon = styled.img`
   max-width: 1.5rem;
   max-height: 1.5rem;
   margin-right: 1rem;
+  filter: ${(props) => (props.wish ? "brightness(0)" : "")};
 `;
 
 const ImgContainer = styled.div`
