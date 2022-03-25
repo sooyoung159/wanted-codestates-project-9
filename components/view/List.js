@@ -14,13 +14,23 @@ const List = (props) => {
   const infinityRef = useRef();
   const notification = useSelector((state) => state.ui.toggle);
 
-  const scrollObserver = useCallback((entries) => {
-    const target = entries[0];
-    if (target.isIntersecting) {
-      let newSize = size + 9;
-      setSize(newSize);
+  useEffect(() => {
+    if (!reviews) {
+      dispatch(fetchReviewData());
+      return;
     }
-  }, []);
+  }, [reviews]);
+
+  const scrollObserver = useCallback(
+    (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        let newSize = size + 9;
+        setSize(newSize);
+      }
+    },
+    [size]
+  );
 
   useEffect(() => {
     const option = {

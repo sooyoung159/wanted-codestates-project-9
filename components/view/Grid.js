@@ -9,13 +9,16 @@ const Grid = () => {
   const infinityRef = useRef();
   const [size, setSize] = useState(9);
 
-  const scrollObserver = useCallback((entries) => {
-    const target = entries[0];
-    if (target.isIntersecting) {
-      let newSize = size + 9;
-      setSize(newSize);
-    }
-  }, []);
+  const scrollObserver = useCallback(
+    (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        let newSize = size + 9;
+        setSize(newSize);
+      }
+    },
+    [size]
+  );
 
   useEffect(() => {
     const option = {
