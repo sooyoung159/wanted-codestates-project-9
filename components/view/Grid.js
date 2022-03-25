@@ -67,6 +67,6 @@ const GridItem = styled.div`
   margin: 1px;
   > img {
     width: 100%;
-    height: 100%;
+    height: 198px;
   }
 `;

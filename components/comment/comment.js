@@ -60,13 +60,12 @@ const FormContainer = styled.div`
         outline: none;
       }
       height: 2.5rem;
-      font-size: 3.13vmin;
+      font-size: 1rem;
       width: 23rem;
       padding-top: 0.2rem;
     }
     > button {
-      /* background-color: white; */
-      font-size: 3.13vmin;
+      font-size: 1rem;
       padding-top: 0.2rem;
     }
   }

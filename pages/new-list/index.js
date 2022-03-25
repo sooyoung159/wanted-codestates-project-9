@@ -30,6 +30,7 @@ const Background = styled.div`
   background-color: lightgray;
   justify-content: space-around;
   align-items: center;
+  /* height: 100vh; */
 `;
 
 const Wrapper = styled.div`

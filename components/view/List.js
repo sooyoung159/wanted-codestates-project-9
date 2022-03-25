@@ -7,7 +7,6 @@ import Comment from "../comment/Comment";
 
 const List = (props) => {
   const reviews = useSelector((state) => state.review.reviews);
-  const review = useSelector((state) => state.review);
   const dispatch = useDispatch();
   const [size, setSize] = useState(9);
   const idIndex = props.index ? props.index : 0;
