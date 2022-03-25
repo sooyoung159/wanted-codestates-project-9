@@ -2,8 +2,6 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import ListDetail from "../../components/lists/ListDetail";
-import NewListForm from "../../components/lists/NewListForm";
 import Notification from "../../components/ui/Notification";
 import List from "../../components/view/List";
 

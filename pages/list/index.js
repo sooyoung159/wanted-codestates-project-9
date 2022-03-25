@@ -1,8 +1,6 @@
-import { useSelector } from "react-redux";
 import styled from "styled-components";
 import Layout from "../../components/layout/Layout";
 import View from "../../components/layout/View";
-import Notification from "../../components/ui/Notification";
 import List from "../../components/view/List";
 
 const ListDetailPage = () => {
